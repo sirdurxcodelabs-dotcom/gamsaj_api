@@ -20,11 +20,9 @@ app.use(cors({
   origin: [
     'http://localhost:5173',
     'http://localhost:5174',
+    'https://gamsaj-website.netlify.app',
     'https://gamsajapp.netlify.app',
-    'https://gamsaj.netlify.app',
-    process.env.CLIENT_URL,
-    process.env.ADMIN_URL,
-  ].filter(Boolean),
+  ],
   credentials: true,
 }));
 app.use(express.json());
