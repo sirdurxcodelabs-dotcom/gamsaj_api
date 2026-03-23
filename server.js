@@ -16,7 +16,17 @@ connectDB();
 notificationScheduler.start();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'https://gamsajapp.netlify.app',
+    'https://gamsaj.netlify.app',
+    process.env.CLIENT_URL,
+    process.env.ADMIN_URL,
+  ].filter(Boolean),
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
