@@ -22,6 +22,8 @@ app.use(cors({
     'http://localhost:5174',
     'https://gamsaj-website.netlify.app',
     'https://gamsajapp.netlify.app',
+    'https://gamsaj.com',
+    'https://www.gamsaj.com',
   ],
   credentials: true,
 }));
@@ -44,6 +46,7 @@ app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/blogs', require('./routes/blogRoutes'));
 app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/company-info', require('./routes/companyInfoRoutes'));
+app.use('/api/billing', require('./routes/billingRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 
 // Health check

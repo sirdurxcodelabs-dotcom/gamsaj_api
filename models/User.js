@@ -84,6 +84,15 @@ const userSchema = new mongoose.Schema(
         default: '',
       },
     },
+    // Digital signature (base64 image URL or Cloudinary URL)
+    signature: {
+      type: String,
+      default: '',
+    },
+    signaturePublicId: {
+      type: String,
+      default: '',
+    },
     isVerified: {
       type: Boolean,
       default: false,

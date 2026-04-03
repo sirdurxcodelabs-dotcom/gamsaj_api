@@ -69,3 +69,40 @@ exports.uploadAvatar = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// @desc    Upload / replace digital signature
+// @route   POST /api/upload/signature
+// @access  Private
+exports.uploadSignature = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'Please upload a signature image' });
+    }
+
+    const User = require('../models/User');
+    const { cloudinary } = require('../config/cloudinary');
+
+    const user = await User.findById(req.user.id);
+    if (user && user.signaturePublicId) {
+      try {
+        await cloudinary.uploader.destroy(user.signaturePublicId);
+      } catch (e) {
+        console.warn('Could not delete old signature:', e.message);
+      }
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { signature: req.file.path, signaturePublicId: req.file.filename },
+      { new: true }
+    ).select('-password');
+
+    res.status(200).json({
+      success: true,
+      message: 'Signature updated successfully',
+      data: { url: req.file.path, publicId: req.file.filename, signature: updatedUser.signature },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
