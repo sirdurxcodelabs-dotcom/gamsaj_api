@@ -16,19 +16,31 @@ connectDB();
 notificationScheduler.start();
 
 // Middleware
+const ALLOWED_ORIGINS = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'https://gamsaj-website.netlify.app',
+  'https://gamsajapp.netlify.app',
+  'https://gamsaj.com',
+  'https://www.gamsaj.com',
+];
+
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'https://gamsaj-website.netlify.app',
-    'https://gamsajapp.netlify.app',
-    'https://gamsaj.com',
-    'https://www.gamsaj.com',
-  ],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Postman, server-to-server)
+    if (!origin) return callback(null, true);
+    if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS blocked: ${origin}`));
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Handle preflight requests for all routes
+app.options('*', cors());
 
 // Request logger middleware
 app.use(logger);
