@@ -309,3 +309,73 @@ exports.forbiddenDelete = (req, res) => {
     message: 'Deleting navigation items is not allowed. Use isActive field to hide items instead.',
   });
 };
+
+// @desc    Create navigation group
+// @route   POST /api/navigation/admin/group
+// @access  Private
+exports.createNavigationGroup = async (req, res) => {
+  try {
+    const { title, type, path } = req.body;
+    if (!title || !type) return res.status(400).json({ success: false, message: 'Title and type are required' });
+    if (type === 'single' && !path) return res.status(400).json({ success: false, message: 'Path is required for single type' });
+
+    const count = await NavigationGroup.countDocuments();
+    const key = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now();
+
+    const group = await NavigationGroup.create({ key, title, type, path: path || '', order: count + 1, isActive: true });
+    res.status(201).json({ success: true, data: group });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+// @desc    Delete navigation group
+// @route   DELETE /api/navigation/admin/group/:id
+// @access  Private
+exports.deleteNavigationGroup = async (req, res) => {
+  try {
+    const group = await NavigationGroup.findById(req.params.id);
+    if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
+    // Also delete all items in this group
+    await NavigationItem.deleteMany({ groupKey: group.key });
+    await group.deleteOne();
+    res.json({ success: true, message: 'Group and its items deleted' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @desc    Create navigation item
+// @route   POST /api/navigation/admin/item
+// @access  Private
+exports.createNavigationItem = async (req, res) => {
+  try {
+    const { title, path, groupKey } = req.body;
+    if (!title || !path || !groupKey) return res.status(400).json({ success: false, message: 'Title, path and groupKey are required' });
+
+    const group = await NavigationGroup.findOne({ key: groupKey });
+    if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
+    if (group.type !== 'dropdown') return res.status(400).json({ success: false, message: 'Can only add items to dropdown groups' });
+
+    const count = await NavigationItem.countDocuments({ groupKey });
+    const key = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now();
+
+    const item = await NavigationItem.create({ key, title, path, groupKey, order: count + 1, isActive: true });
+    res.status(201).json({ success: true, data: item });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+// @desc    Delete navigation item
+// @route   DELETE /api/navigation/admin/item/:id
+// @access  Private
+exports.deleteNavigationItem = async (req, res) => {
+  try {
+    const item = await NavigationItem.findByIdAndDelete(req.params.id);
+    if (!item) return res.status(404).json({ success: false, message: 'Item not found' });
+    res.json({ success: true, message: 'Item deleted' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};

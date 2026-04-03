@@ -15,6 +15,9 @@ const { protect } = require('../middleware/auth');
 const { hasPermission } = require('../middleware/permission');
 const { PERMISSIONS } = require('../config/permissions');
 
+// Public route — needed for registration role selector
+router.get('/public', getRoles);
+
 router.use(protect);
 
 router

@@ -82,7 +82,6 @@ projectSchema.pre('save', function () {
   }
 });
 
-projectSchema.index({ slug: 1 });
 projectSchema.index({ status: 1, isPublishedToWebsite: 1 });
 projectSchema.index({ assignedUsers: 1 });
 

@@ -14,11 +14,23 @@ class NotificationScheduler {
     this.checkInterval = setInterval(() => {
       this.checkUpcomingEvents();
       this.check24HourUpdates();
-    }, 5 * 60 * 1000); // 5 minutes
+    }, 5 * 60 * 1000);
 
-    // Run immediately on start
-    this.checkUpcomingEvents();
-    this.check24HourUpdates();
+    // Delay initial run until MongoDB is ready (wait up to 30s)
+    const mongoose = require('mongoose');
+    const runWhenReady = () => {
+      if (mongoose.connection.readyState === 1) {
+        this.checkUpcomingEvents();
+        this.check24HourUpdates();
+      } else {
+        mongoose.connection.once('connected', () => {
+          this.checkUpcomingEvents();
+          this.check24HourUpdates();
+        });
+      }
+    };
+    // Give connection a moment to establish
+    setTimeout(runWhenReady, 3000);
   }
 
   // Stop the scheduler

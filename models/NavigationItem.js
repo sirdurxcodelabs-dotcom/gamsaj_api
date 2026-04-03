@@ -26,7 +26,6 @@ const navigationItemSchema = new mongoose.Schema(
     path: {
       type: String,
       required: [true, 'Please provide a path'],
-      immutable: true, // Path stays immutable - frontend contract
       trim: true,
     },
     order: {

@@ -6,43 +6,25 @@ const {
   updateNavigationGroup,
   updateNavigationItem,
   reorderNavigation,
-  forbiddenCreate,
-  forbiddenDelete,
+  createNavigationGroup,
+  createNavigationItem,
 } = require('../controllers/navigationController');
 const { protect } = require('../middleware/auth');
-const { hasPermission, isSuperAdmin } = require('../middleware/permission');
+const { hasPermission } = require('../middleware/permission');
 
-// Public routes (for website)
+// Public
 router.get('/', getPublicNavigation);
 
-// Admin routes (protected)
+// Admin — protected
 router.get('/admin', protect, hasPermission('view_navigation'), getAdminNavigation);
+router.put('/admin/reorder', protect, hasPermission('edit_navigation'), reorderNavigation);
 
-router.put(
-  '/admin/group/:id',
-  protect,
-  hasPermission('edit_navigation'),
-  updateNavigationGroup
-);
+// Groups — no delete (use isActive to hide)
+router.post('/admin/group', protect, hasPermission('edit_navigation'), createNavigationGroup);
+router.put('/admin/group/:id', protect, hasPermission('edit_navigation'), updateNavigationGroup);
 
-router.put(
-  '/admin/item/:id',
-  protect,
-  hasPermission('edit_navigation'),
-  updateNavigationItem
-);
-
-router.put(
-  '/admin/reorder',
-  protect,
-  hasPermission('edit_navigation'),
-  reorderNavigation
-);
-
-// Forbidden routes (return 403)
-router.post('/admin/group', protect, forbiddenCreate);
-router.post('/admin/item', protect, forbiddenCreate);
-router.delete('/admin/group/:id', protect, forbiddenDelete);
-router.delete('/admin/item/:id', protect, forbiddenDelete);
+// Items — no delete (use isActive to hide)
+router.post('/admin/item', protect, hasPermission('edit_navigation'), createNavigationItem);
+router.put('/admin/item/:id', protect, hasPermission('edit_navigation'), updateNavigationItem);
 
 module.exports = router;

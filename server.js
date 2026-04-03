@@ -39,9 +39,6 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Handle preflight requests for all routes
-app.options('*', cors());
-
 // Request logger middleware
 app.use(logger);
 
@@ -58,6 +55,8 @@ app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/blogs', require('./routes/blogRoutes'));
 app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/company-info', require('./routes/companyInfoRoutes'));
+app.use('/api/team', require('./routes/teamRoutes'));
+app.use('/api/partners', require('./routes/partnerRoutes'));
 app.use('/api/billing', require('./routes/billingRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 
