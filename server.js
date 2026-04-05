@@ -46,6 +46,12 @@ app.use(logger);
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/roles', require('./routes/roleRoutes'));
+// Increase timeout for upload routes (Cloudinary can be slow)
+app.use('/api/upload', (req, res, next) => {
+  req.setTimeout(60000)
+  res.setTimeout(60000)
+  next()
+})
 app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use('/api/navigation', require('./routes/navigationRoutes'));
 app.use('/api/connections', require('./routes/connectionRoutes'));
@@ -57,6 +63,7 @@ app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/company-info', require('./routes/companyInfoRoutes'));
 app.use('/api/team', require('./routes/teamRoutes'));
 app.use('/api/partners', require('./routes/partnerRoutes'));
+app.use('/api/testimonials', require('./routes/testimonialRoutes'));
 app.use('/api/billing', require('./routes/billingRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 
